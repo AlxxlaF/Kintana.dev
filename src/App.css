@@ -1,0 +1,19 @@
+/* slider thumb styling */
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  border: none;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  border: none;
+}
