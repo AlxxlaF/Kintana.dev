@@ -174,6 +174,23 @@ export default function ControlPanel({ settings, onChange, isOpen, onToggle }) {
           >
             {t("reset")}
           </button>
+
+          {/* Ko-fi */}
+          <a
+            href="https://ko-fi.com/ynitum"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "block", width: "100%", padding: "8px 0",
+              marginTop: 8, textAlign: "center",
+              background: "rgba(255,94,94,0.12)",
+              border: "1px solid rgba(255,94,94,0.2)", borderRadius: 8,
+              color: "rgba(255,180,180,0.8)", cursor: "pointer", fontSize: 12,
+              textDecoration: "none",
+            }}
+          >
+            ☕ Support on Ko-fi
+          </a>
         </div>
       )}
     </>
