@@ -35,28 +35,14 @@ export default function ControlPanel({ settings, onChange }) {
   const timerRef = useRef(null);
   const panelRef = useRef(null);
 
-  const resetFadeTimer = () => {
-    setOpacity(1);
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      setOpacity(0);
-      setTimeout(() => setVisible(false), 500);
-    }, 4000);
-  };
-
   const toggle = () => {
     if (visible) {
-      clearTimeout(timerRef.current);
       setOpacity(0);
       setTimeout(() => setVisible(false), 500);
     } else {
       setVisible(true);
-      resetFadeTimer();
+      setOpacity(1);
     }
-  };
-
-  const handleInteraction = () => {
-    if (visible) resetFadeTimer();
   };
 
   const [btnOpacity, setBtnOpacity] = useState(1);
@@ -98,8 +84,6 @@ export default function ControlPanel({ settings, onChange }) {
       {visible && (
         <div
           ref={panelRef}
-          onMouseMove={handleInteraction}
-          onMouseDown={handleInteraction}
           style={{
             position: "fixed", top: 56, right: 16, zIndex: 1000, width: 260,
             maxHeight: "calc(100vh - 80px)", overflowY: "auto",
@@ -173,6 +157,23 @@ export default function ControlPanel({ settings, onChange }) {
             </div>
           ))}
 
+          {/* Fullscreen */}
+          <button
+            onClick={() => {
+              if (document.fullscreenElement) document.exitFullscreen();
+              else document.documentElement.requestFullscreen().catch(() => {});
+            }}
+            style={{
+              width: "100%", padding: "8px 0", marginBottom: 8,
+              background: "rgba(140, 180, 255, 0.1)",
+              border: "1px solid rgba(140, 180, 255, 0.2)", borderRadius: 8,
+              color: "rgba(140, 180, 255, 0.8)", cursor: "pointer", fontSize: 12,
+            }}
+          >
+            {t("fullscreen")}
+          </button>
+
+          {/* Reset */}
           <button
             onClick={() => onChange(getDefaults())}
             style={{

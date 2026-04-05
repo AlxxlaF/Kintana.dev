@@ -49,6 +49,7 @@ export default function MusicPlayer() {
   const volumeRef = useRef(volume);
   const crossfadeJustFinishedRef = useRef(false);
   const crossfadeDurationRef = useRef(crossfadeDuration);
+  const playOnNextTrackRef = useRef(false);
 
   const { t } = useLang();
   const track = PLAYLIST[trackIdx];
@@ -159,7 +160,11 @@ export default function MusicPlayer() {
     audio.volume = muted ? 0 : volume;
     setCurrentTime(0);
     setDuration(0);
-    if (playing) audio.play().catch(() => {});
+    // Play immediately — either already playing or explicitly requested
+    if (playing || playOnNextTrackRef.current) {
+      playOnNextTrackRef.current = false;
+      audio.play().catch(() => {});
+    }
   }, [trackIdx]);
 
   const togglePlay = () => {
@@ -195,11 +200,10 @@ export default function MusicPlayer() {
 
   const selectTrack = (i) => {
     stop();
+    // Always play when selecting a track from the playlist
+    playOnNextTrackRef.current = true;
     setTrackIdx(i);
-    if (!playing) {
-      setPlaying(true);
-      setTimeout(() => audioRef.current?.play().catch(() => {}), 50);
-    }
+    setPlaying(true);
   };
 
   const handleVolume = (e) => {
@@ -226,8 +230,8 @@ export default function MusicPlayer() {
 
   return (
     <>
-      <audio ref={audioRef} preload="none" />
-      <audio ref={audioNextRef} preload="none" />
+      <audio ref={audioRef} preload="auto" />
+      <audio ref={audioNextRef} preload="auto" />
 
       <button
         onClick={() => setExpanded(!expanded)}
@@ -452,7 +456,3 @@ const iconBtn = (active) => ({
   opacity: active ? 0.8 : 0.3, transition: "opacity 0.2s",
 });
 
-const sliderStyle = {
-  flex: 1, height: 4, appearance: "none",
-  background: "rgba(255,255,255,0.1)", borderRadius: 2, outline: "none", cursor: "pointer",
-};
