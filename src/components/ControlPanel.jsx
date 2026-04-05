@@ -1,5 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useLang, LANGUAGES } from "../i18n";
+
+const SLIDER_STYLE = `
+  input[type=range].kintana-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.12); outline: none; cursor: pointer; }
+  input[type=range].kintana-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; cursor: pointer; box-shadow: 0 0 6px rgba(255,255,255,0.4); transition: transform 0.1s ease, box-shadow 0.1s ease; }
+  input[type=range].kintana-slider::-webkit-slider-thumb:hover { transform: scale(1.25); box-shadow: 0 0 10px rgba(255,255,255,0.6); }
+  input[type=range].kintana-slider::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; cursor: pointer; border: none; box-shadow: 0 0 6px rgba(255,255,255,0.4); }
+  input[type=range].kintana-slider::-webkit-slider-runnable-track { border-radius: 2px; }
+  input[type=range].kintana-slider::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.12); }
+`;
 
 const SECTIONS = [
   {
@@ -13,9 +22,9 @@ const SECTIONS = [
   {
     labelKey: "animation",
     controls: [
-      { key: "twinkleIntensity", labelKey: "twinkle", min: 0, max: 2, step: 0.1, default: 1 },
-      { key: "rotationSpeed", labelKey: "rotation", min: 0, max: 3, step: 0.1, default: 1 },
-      { key: "shootingFreq", labelKey: "shootingStars", min: 0, max: 3, step: 0.1, default: 1 },
+      { key: "twinkleIntensity", labelKey: "twinkle", min: 0, max: 2, step: 0.01, default: 1 },
+      { key: "rotationSpeed", labelKey: "rotation", min: 0, max: 3, step: 0.01, default: 1 },
+      { key: "shootingFreq", labelKey: "shootingStars", min: 0, max: 3, step: 0.01, default: 1 },
     ],
   },
 ];
@@ -66,6 +75,7 @@ export default function ControlPanel({ settings, onChange, isOpen, onToggle }) {
 
   return (
     <>
+      <style>{SLIDER_STYLE}</style>
       {/* Toggle button */}
       <button
         onClick={(e) => { e.stopPropagation(); onToggle(); }}
@@ -148,14 +158,10 @@ export default function ControlPanel({ settings, onChange, isOpen, onToggle }) {
                   </div>
                   <input
                     type="range"
+                    className="kintana-slider"
                     min={ctrl.min} max={ctrl.max} step={ctrl.step}
                     value={settings[ctrl.key]}
                     onChange={(e) => onChange({ ...settings, [ctrl.key]: parseFloat(e.target.value) })}
-                    style={{
-                      width: "100%", height: 4, appearance: "none",
-                      background: "rgba(255,255,255,0.12)", borderRadius: 2,
-                      outline: "none", cursor: "pointer",
-                    }}
                   />
                 </div>
               ))}

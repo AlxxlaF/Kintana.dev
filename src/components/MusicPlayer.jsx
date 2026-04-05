@@ -28,7 +28,7 @@ function formatTime(sec) {
 
 export default function MusicPlayer({ isOpen, onToggle }) {
   const [playing, setPlaying] = useState(false);
-  const [trackIdx, setTrackIdx] = useState(0);
+  const [trackIdx, setTrackIdx] = useState(() => Math.floor(Math.random() * PLAYLIST.length));
   const [volume, setVolume] = useState(0.4);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -64,9 +64,44 @@ export default function MusicPlayer({ isOpen, onToggle }) {
   const crossfadeJustFinishedRef = useRef(false);
   const crossfadeDurationRef = useRef(crossfadeDuration);
   const playOnNextTrackRef = useRef(false);
+  const autoplayDoneRef = useRef(false);
 
   const { t } = useLang();
   const track = PLAYLIST[trackIdx];
+
+  // Autoplay on load — try immediately, fallback to first interaction
+  useEffect(() => {
+    const attempt = () => {
+      if (autoplayDoneRef.current) return;
+      const audio = audioRef.current;
+      if (!audio || !audio.src) return;
+      audio.play().then(() => {
+        autoplayDoneRef.current = true;
+        setPlaying(true);
+      }).catch(() => {
+        // Browser blocked autoplay — start on first user interaction
+        const onInteraction = () => {
+          if (autoplayDoneRef.current) return;
+          audio.play().then(() => {
+            autoplayDoneRef.current = true;
+            setPlaying(true);
+          }).catch(() => {});
+          cleanup();
+        };
+        const cleanup = () => {
+          window.removeEventListener("click", onInteraction);
+          window.removeEventListener("keydown", onInteraction);
+          window.removeEventListener("touchstart", onInteraction);
+        };
+        window.addEventListener("click", onInteraction);
+        window.addEventListener("keydown", onInteraction);
+        window.addEventListener("touchstart", onInteraction);
+      });
+    };
+    // Small delay to let the trackIdx effect set audio.src first
+    const timer = setTimeout(attempt, 150);
+    return () => clearTimeout(timer);
+  }, []);
   volumeRef.current = volume;
   crossfadeDurationRef.current = crossfadeDuration;
 
